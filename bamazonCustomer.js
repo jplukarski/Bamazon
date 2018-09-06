@@ -43,7 +43,28 @@ function start() {
         }
     ])
         .then(function (answer) {
-            connection.query
+            var idChosen = parseInt(answer.product_id);
+            var purchaseQuantity = answer.units_quantity;
+            connection.query("select * from products", function (err, results) {
+                if (err) throw err;
+                for (i = 0; i < results.length; i++) {
+                    if (results[i].item_id === idChosen && results[i].stock_quantity !== 0 && results[i].stock_quantity < purchaseQuantity) {
+                        //update database by subtracting 1 from the quantity
+                        connection.query("update products set ? where ?",
+                            [
+                                { stock_quantity: results[i].stock_quantity - 1 },
+                                { item_id: results[i].item_id }
+                            ]
+                        )
+                        //Display the price
+                        console.log("Your total will be: $" + results[i].price)
+                    } else if (results[i].stock_quantity < purchaseQuantity) {
+                        console.log("I'm sorry, but we only have " + results[i].stock_quantity + " left in our inventory.")
+                    } else if (results[i].stock_quantity === 0) {
+                        console.log("We are sorry but this item is currently sold out! Please check back with us soon as we are expecting a new shipment shortly.")
+                    }
+                }
+            })
         })
 }
 
