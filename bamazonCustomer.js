@@ -19,8 +19,9 @@ connection.query("select * from products", function (err, results) {
     for (var i = 0; i < results.length; i++) {
         console.log("-----------------" + "\n" + "Product ID: " + results[i].item_id + "\n" + "Product Name: " + results[i].product_name + "\n" + "Price: " + results[i].price + "\n")
     }
+    start();
 });
-start();
+
 function start() {
 
     inquirer.prompt([
