@@ -54,7 +54,15 @@ function start() {
             connection.query("select * from products", function (err, results) {
                 if (err) throw err;
                 for (i = 0; i < results.length; i++) {
-                    if (results[i].item_id === idChosen && results[i].stock_quantity !== 0 && results[i].stock_quantity > purchaseQuantity) {
+                    if (results[i].item_id === idChosen && results[i].stock_quantity === 0) {
+                        console.log("We are sorry but this item is currently sold out! Please check back with us soon as we are expecting a new shipment shortly.");
+                        anotherPurchase();
+                    }
+                    else if (results[i].item_id === idChosen && results[i].stock_quantity < purchaseQuantity) {
+                        console.log("I'm sorry, but we only have " + results[i].stock_quantity + " left in our inventory.");
+                        anotherPurchase();
+                        break;
+                    } else if (results[i].item_id === idChosen && results[i].stock_quantity !== 0 && results[i].stock_quantity >= purchaseQuantity) {
                         connection.query("update products set ? where ?",
                             [
                                 { stock_quantity: results[i].stock_quantity - purchaseQuantity },
@@ -62,13 +70,6 @@ function start() {
                             ]
                         )
                         console.log("Your total will be: $" + results[i].price * purchaseQuantity)
-                        anotherPurchase();
-                    } else if (results[i].item_id === idChosen && results[i].stock_quantity < purchaseQuantity) {
-                        console.log("I'm sorry, but we only have " + results[i].stock_quantity + " left in our inventory.");
-                        anotherPurchase();
-                        break;
-                    } else if (results[i].item_id === idChosen && results[i].stock_quantity === 0) {
-                        console.log("We are sorry but this item is currently sold out! Please check back with us soon as we are expecting a new shipment shortly.");
                         anotherPurchase();
                     }
                 }
